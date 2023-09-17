@@ -107,6 +107,23 @@ services:
     depends_on:
       - trillian-log-server
 
+  #### dex ####
+
+  dex:
+    image: ghcr.io/dexidp/dex:v2.37.0
+    command:
+      - dex
+      - serve
+      - --web-http-addr
+      - 0.0.0.0:5556
+      - --telemetry-addr
+      - 0.0.0.0:5558
+      - /etc/dex/config.yaml
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex:/etc/dex/
+
   #### tuf ####
   #### tsa ####
 

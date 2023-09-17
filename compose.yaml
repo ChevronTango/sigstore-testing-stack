@@ -13,7 +13,7 @@ services:
       - /var/run/fulcio-secrets/int.crt
       - --fileca-key-passwd
       - $(cat /var/run/fulcio-ca-password)
-      - --ct-log-url=http://ctlog/sigstorescaffolding
+      - --ct-log-url=http://ctlog:6962/sigstorescaffolding
     secrets:
       - fulcio-ca-password
     volumes:

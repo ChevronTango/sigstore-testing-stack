@@ -15,6 +15,14 @@ openssl req \
 
 openssl x509 -signkey fulcio-secrets/int.key -in fulcio-secrets/int.csr -req -days 365 -out fulcio-secrets/int.crt -extensions v3_ca -extfile fulcio-secrets/fulcio.conf
 
+cp fulcio-secrets/int.crt ctfe-config/fulcio-0
+
+openssl ecparam -name prime256v1 -genkey -noout -out ctfe-config/private.key
+openssl ec -in ctfe-config/private.key -pubout -out ctfe-config/public
+
+openssl pkcs8 -topk8 -nocrypt -in ctfe-config/private.key -out ctfe-config/private
+
+
 # openssl x509 -text -noout -in fulcio-secrets/int.crt
 
 

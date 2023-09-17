@@ -13,18 +13,26 @@ services:
       - /var/run/fulcio-secrets/int.crt
       - --fileca-key-passwd
       - $(cat /var/run/fulcio-ca-password)
-      - --ct-log-url=http://ctlog:6962/sigstorescaffolding
+      - --ct-log-url=http://ct_server:6962/trillian
     secrets:
       - fulcio-ca-password
     volumes:
       - ./fulcio-secrets:/var/run/fulcio-secrets/
       - ./fulcio-config:/etc/fulcio-config/
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     ports:
       - "5554:5554"
       - "5555:5555"
+      - "2112:2112"
     depends_on:
-      - ctlog
+      - dex
+      - ct_server
 
   #### rekor ####
   redis:
@@ -71,8 +79,8 @@ services:
     ]
     restart: always # retry while mysql is starting up
     expose:
-      - "8090:8090"
-      - "8091:8091"
+      - "8090:8090" # grpc
+      - "8091:8091" # http
     depends_on:
       - mysql
 
@@ -88,30 +96,44 @@ services:
     ]
     restart: always # retry while mysql is starting up
     expose:
-      - "8090:8090"
-      - "8091:8091"
+      - "8090:8090" # grpc
+      - "8091:8091" # http
     depends_on:
       - mysql
 
   #### ctlog ####
-
-  ctlog:
-    image: ghcr.io/sigstore/scaffolding/ct_server:v0.6.7
-    command:
-      - --http_endpoint=0.0.0.0:6962
-      - --log_config=/ctfe-keys/config
-      - --alsologtostderr
-    volumes:
-      - ./ctfe-keys:/ctfe-keys
-    ports:
-      - "6962:6962"
+  ctfe_init:
+    build:
+      context: .
+      dockerfile: Dockerfile.ctfe_init
     depends_on:
       - trillian-log-server
+    volumes:
+      - ./ctfeConfig:/etc/config/:rw
+
+  ct_server:
+    image: gcr.io/trillian-opensource-ci/ctfe
+    volumes:
+      - ./ctfeConfig:/etc/config/:ro
+    command: [
+        "--log_config" ,"/etc/config/ct_server.cfg",
+        "--log_rpc_server", "trillian-log-server:8090",
+        "--http_endpoint", "0.0.0.0:6962",
+        "--alsologtostderr",
+    ]
+    restart: always # retry while ctfe_init is running
+    depends_on:
+      - trillian-log-server
+      - trillian-log-signer
+      - ctfe_init
+    ports:
+      - "6962:6962"
 
   #### dex ####
 
   dex:
     image: ghcr.io/dexidp/dex:v2.37.0
+    restart: always
     command:
       - dex
       - serve
@@ -131,3 +153,6 @@ services:
 secrets:
   fulcio-ca-password:
     file: fulcio-secrets/password.txt
+
+# volumes:
+#   ctfeConfig: {}

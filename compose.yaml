@@ -1,0 +1,115 @@
+services:
+  #### fulcio ####
+  fulcio:
+    image: gcr.io/projectsigstore/fulcio:v1.4.0
+    command:
+      - serve
+      - --port=5555
+      - --grpc-port=5554
+      - --ca=fileca
+      - --fileca-key
+      - /var/run/fulcio-secrets/int.key
+      - --fileca-cert
+      - /var/run/fulcio-secrets/int.crt
+      - --fileca-key-passwd
+      - $(cat /var/run/fulcio-ca-password)
+      - --ct-log-url=http://ctlog/sigstorescaffolding
+    secrets:
+      - fulcio-ca-password
+    volumes:
+      - ./fulcio-secrets:/var/run/fulcio-secrets/
+    restart: always
+    ports:
+      - "5554:5554"
+      - "5555:5555"
+    depends_on:
+      - ctlog
+
+  #### rekor ####
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    expose:
+      - '6379:6379'
+    command: redis-server
+
+  rekor:
+    image: gcr.io/projectsigstore/rekor-server:v1.3.0
+    command:
+      - serve
+      - --rekor_server.address=0.0.0.0
+      - --trillian_log_server.address=trillian-log-server
+      - --trillian_log_server.port=8090
+      - --redis_server.address=redis
+      - --redis_server.port=6379
+    depends_on:
+      - trillian-log-server
+      - redis
+    restart: always
+    ports:
+      - "3000:3000"
+
+  #### trillian ####
+  mysql:
+    image: gcr.io/trillian-opensource-ci/db_server:v1.5.2
+    environment:
+      - MYSQL_ROOT_PASSWORD=zaphod
+      - MYSQL_DATABASE=trillian
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=zaphod
+    restart: always # keep the MySQL server running
+
+  trillian-log-server:
+    image: gcr.io/projectsigstore/trillian_log_server:v1.3.0
+    command: [
+      "--storage_system=mysql",
+      "--mysql_uri=user:zaphod@tcp(mysql:3306)/trillian",
+      "--rpc_endpoint=0.0.0.0:8090",
+      "--http_endpoint=0.0.0.0:8091",
+      "--alsologtostderr",
+    ]
+    restart: always # retry while mysql is starting up
+    expose:
+      - "8090:8090"
+      - "8091:8091"
+    depends_on:
+      - mysql
+
+  trillian-log-signer:
+    image: gcr.io/projectsigstore/trillian_log_signer:v1.3.0
+    command: [
+      "--storage_system=mysql",
+      "--mysql_uri=user:zaphod@tcp(mysql:3306)/trillian",
+      "--rpc_endpoint=0.0.0.0:8090",
+      "--http_endpoint=0.0.0.0:8091",
+      "--force_master",
+      "--alsologtostderr",
+    ]
+    restart: always # retry while mysql is starting up
+    expose:
+      - "8090:8090"
+      - "8091:8091"
+    depends_on:
+      - mysql
+
+  #### ctlog ####
+
+  ctlog:
+    image: ghcr.io/sigstore/scaffolding/ct_server:v0.6.7
+    command:
+      - --http_endpoint=0.0.0.0:6962
+      - --log_config=/ctfe-keys/config
+      - --alsologtostderr
+    volumes:
+      - ./ctfe-keys:/ctfe-keys
+    ports:
+      - "6962:6962"
+    depends_on:
+      - trillian-log-server
+
+  #### tuf ####
+  #### tsa ####
+
+secrets:
+  fulcio-ca-password:
+    file: fulcio-secrets/password.txt

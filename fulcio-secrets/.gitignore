@@ -1,0 +1,6 @@
+*.pem
+*.csr
+password.txt
+*.key
+*.crt
+*.p12

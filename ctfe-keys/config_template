@@ -1,0 +1,1 @@
+backends:{backend:{name:"trillian" backend_spec:"trillian-log-server:8091"}} log_configs:{config:{log_id:1234567890123456789 prefix:"sigstorescaffolding" roots_pem_file:"/ctfekeys/fulcio-0" private_key:{[type.googleapis.com/keyspb.PEMKeyFile]:{path:"/ctfe-keys/private" password:"test"}} public_key:{der:""} ext_key_usages:"CodeSigning" log_backend_name:"trillian"}}

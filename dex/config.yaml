@@ -1,10 +1,16 @@
 # Set it to a valid URL
-issuer: http://my-issuer-url.com
+issuer: https://5556-chevrontang-sigstoretes-6n3nt8yrvpr.ws-eu104.gitpod.io
 
 # See https://dexidp.io/docs/storage/ for more options
 storage:
   type: memory
 
-# Enable at least one connector
-# See https://dexidp.io/docs/connectors/ for more options
-enablePasswordDB: true
+staticClients:
+  - id: sigstore
+    name: 'Sigstore'
+    public: true
+
+connectors:
+  - type: mockCallback
+    id: mock
+    name: Example

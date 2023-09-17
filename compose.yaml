@@ -18,6 +18,7 @@ services:
       - fulcio-ca-password
     volumes:
       - ./fulcio-secrets:/var/run/fulcio-secrets/
+      - ./fulcio-config:/etc/fulcio-config/
     restart: always
     ports:
       - "5554:5554"

@@ -101,17 +101,20 @@ services:
     command:
       - serve
       - --rekor_server.address=0.0.0.0
-      - --rekor_server.signer=/var/run/rekor-secrets/ca.key
+      - --rekor_server.signer=/var/run/rekor-secrets/cert.pem
       - --rekor_server.signer-passwd=$(cat /var/run/rekor-secrets/password.txt)
       - --trillian_log_server.address=trillian-log-server
       - --trillian_log_server.port=8090
       - --redis_server.address=redis
       - --redis_server.port=6379
+      - --enable_attestation_storage=true
+      - --attestation_storage_bucket=file:///var/run/attestations
     depends_on:
       - trillian-log-server
       - redis
       - system_init
     volumes:
+      - ./data/attestations:/var/run/attestations:z"
       - ./data/rekor:/var/run/rekor-secrets/:ro
     restart: always
     ports:
@@ -205,7 +208,6 @@ services:
 
   tuf:
     image: httpd:latest
-    container_name: my-apache-app
     ports:
     - '8080:80'
     volumes:

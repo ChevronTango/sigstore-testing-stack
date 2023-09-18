@@ -2,7 +2,7 @@
 tasks:
   - name: Script Task
     init: docker compose build
-    command: ./start.sh -d
+    command: URL_PATTERN=$(gp url 5555 | sed 's@5555@%s@') docker compose up -d
   - command: brew tap sigstore/tap && brew install gitsign && brew install cosign
 
 # List the ports to expose. Learn more: https://www.gitpod.io/docs/configure/workspaces/ports

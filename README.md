@@ -19,11 +19,11 @@ Sigstore is a complicated stack and this project leans heavily on the documentat
 
 This project was built with Gitpod in mind, and the quickest way for users to get started is to open a Gitpod workspace. Gitpod will automatically run the start scripts and initialise a fully working stack that users can integrate with their own systems.
 
-When you open the workspace, Gitpod will run `./start.sh` which will initialize and run the scaffolding with all of the components needed.
+When you open the workspace, Gitpod will run `docker compose up` which will initialize and run the scaffolding with all of the components needed.
 
 ## Running Locally
 
-I haven't done much testing locally, but I've tried to keep the majority of the hard work in docker containers where possible. In theory all you need to do is run the `./start.sh` script and the stack should stand up just the same as it would in Gitpod. The only difference is that the URLs and Dex Issuer will be at `localhost` instead of your Gitpod URL.
+I haven't done much testing locally, but I've tried to keep the majority of the hard work in docker containers where possible. In theory all you need to do is run the `docker compose up` script and the stack should stand up just the same as it would in Gitpod. The only difference is that the URLs and Dex Issuer will be at `localhost` instead of your Gitpod URL.
 
 ## Client Setup
 

@@ -3,38 +3,26 @@
     "ghcr.io/devcontainers-contrib/features/gitsign:1": {},
     "ghcr.io/devcontainers-contrib/features/cosign:1": {}
   },
-  "forwardPorts": [
-    3000,
-    5555,
-    5556,
-    6962,
-    8080
-  ],
   "portsAttributes": {
     "3000": {
       "label": "Rekor",
       "protocol": "http",
-      "visibility": "public"
     },
     "5555": {
       "label": "Fulcio",
       "protocol": "http",
-      "visibility": "public"
     },
     "5556": {
       "label": "Dex",
       "protocol": "http",
-      "visibility": "public"
     },
     "6962": {
       "label": "CTLog",
       "protocol": "http",
-      "visibility": "public"
     },
     "8080": {
       "label": "TUF",
       "protocol": "http",
-      "visibility": "public",
     }
   },
   "otherPortsAttributes": {

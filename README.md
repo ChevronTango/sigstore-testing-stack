@@ -53,6 +53,7 @@ git config --global gitsign.fulcio $(gp url 5555) # Private Fulcio
 git config --global gitsign.rekor $(gp url 3000) # Private Rekor
 git config --global gitsign.issuer $(gp url 5556) # Private Issuer
 
+# Cosign initialization is only needed when doing verification. Can be skipped if the user is just doing signing.
 cosign initialize --mirror=$(gp url 8080) --root=$(gp url 8080)/root.json
 ```
 

@@ -1,0 +1,8 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/bash-command:1": {
+      "command": "URL_PATTERN=https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev\n./start.sh"
+    }
+  }
+}

@@ -49,12 +49,25 @@ git config --global gpg.format x509  # Gitsign expects x509 args
 3. Configure your gitsign to use your private instance. If you are in the same gitpod that is running your stack then the below commands will work. You may need to adjust them if you are running Sigstore in another location.
 
 ```
+# Gitpod
 git config --global gitsign.fulcio $(gp url 5555) # Private Fulcio
 git config --global gitsign.rekor $(gp url 3000) # Private Rekor
 git config --global gitsign.issuer $(gp url 5556) # Private Issuer
 
 # Cosign initialization is only needed when doing verification. Can be skipped if the user is just doing signing.
 cosign initialize --mirror=$(gp url 8080) --root=$(gp url 8080)/root.json
+```
+
+```
+# GitHub Codespaces
+URL_PATTERN="https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev"
+
+git config --global gitsign.fulcio $(printf $URL_PATTERN 5555) # Private Fulcio
+git config --global gitsign.rekor $(printf $URL_PATTERN 3000) # Private Rekor
+git config --global gitsign.issuer $(printf $URL_PATTERN 5556) # Private Issuer
+
+# Cosign initialization is only needed when doing verification. Can be skipped if the user is just doing signing.
+cosign initialize --mirror=$(printf $URL_PATTERN 8080) --root=$(printf $URL_PATTERN 8080)/root.json
 ```
 
 4. Make a signed Commit

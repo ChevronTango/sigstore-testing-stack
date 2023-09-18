@@ -37,5 +37,5 @@
       "visibility": "public"
     }
   },
-  "postStartCommand": "URL_PATTERN=\"https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev\" docker compose up -d"
+  "postStartCommand": "gh codespace ports visibility 3000:public 5555:public 5556:public 6962:public 8080:public -c $CODESPACE_NAME && export URL_PATTERN=\"https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev\" && docker compose up -d"
 }

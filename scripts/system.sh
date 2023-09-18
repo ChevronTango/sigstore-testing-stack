@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ########## FULCIO ############
+if [ ! -f /ect/fulcio/password.txt ]; then
 # Generate A password to encrypt the certificate key with
 FULCIO_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 
@@ -25,18 +26,22 @@ openssl x509 -signkey /ect/fulcio/ca.key -in /ect/fulcio/ca.csr -req -days 365 -
 # update the fulcio config to use our dex issuer
 sed "s@http://localhost:5556@$(printf "$URL_PATTERN" "5556")@" /root/fulcio/config.json > /ect/fulcio/config.json
 
+fi
 
 
 
 ########## DEX ###############
+if [ ! -f /ect/dex/config.yaml ]; then
 
 # Update the dex config to use our issuer
 sed "s@issuer:.*@issuer: $(printf "$URL_PATTERN" "5556")@" /root/dex/config.yaml  > /ect/dex/config.yaml
 
+fi
 
 
 
 ########## REKOR #############
+if [ ! -f /etc/rekor/password.txt ]; then
 # Generate A password to encrypt the certificate with
 REKOR_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 
@@ -58,9 +63,11 @@ chmod 7777 /etc/rekor/ca.key
 # self sign the csr
 openssl x509 -signkey /etc/rekor/ca.key -in /etc/rekor/ca.csr -req -days 365 -out /etc/rekor/ca.crt -extensions v3_ca -extfile /root/fulcio/fulcio.conf
 
+fi
 
 
 ########## CTFE ##############
+if [ ! -f /etc/ctfe/password.txt ]; then
 # Generate A password to encrypt the keys with
 CTFE_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 
@@ -78,3 +85,5 @@ chmod 7777 /etc/ctfe/privkey.pem
 
 # Generate the public key from the private
 openssl ec -passin pass:$CTFE_PASSWORD -in /etc/ctfe/privkey.pem -pubout -out /etc/ctfe/pubkey.pem
+
+fi

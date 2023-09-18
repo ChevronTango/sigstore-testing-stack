@@ -42,15 +42,14 @@ services:
       - --grpc-port=5554
       - --ca=fileca
       - --fileca-key
-      - /var/run/fulcio-secrets/ca.key
+      - /etc/fulcio-config/ca.key
       - --fileca-cert
-      - /var/run/fulcio-secrets/ca.crt
+      - /etc/fulcio-config/ca.crt
       - --fileca-key-passwd
-      - $(cat /var/run/fulcio-secrets/password.txt)
+      - $(cat /etc/fulcio-config/password.txt)
       - --ct-log-url=http://ct_server:6962/trillian
     volumes:
-      - ./data/fulcio:/var/run/fulcio-secrets/:ro
-      - ./data/fulcio/config.json:/etc/fulcio-config/config.json:ro
+      - ./data/fulcio/:/etc/fulcio-config/:ro
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5555/healthz"]
@@ -89,6 +88,7 @@ services:
     depends_on:
       - trillian-log-server
       - redis
+      - system_init
     volumes:
       - ./data/rekor:/var/run/rekor-secrets/:ro
     restart: always
@@ -104,6 +104,8 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=zaphod
     restart: always # keep the MySQL server running
+    volumes:
+      - my-db:/var/lib/mysql
 
   trillian-log-server:
     image: gcr.io/projectsigstore/trillian_log_server:v1.3.0
@@ -180,5 +182,5 @@ services:
   #### tuf ####
   #### tsa ####
 
-# volumes:
-#   ctfeConfig: {}
+volumes:
+  my-db:

@@ -105,7 +105,7 @@ services:
       - MYSQL_PASSWORD=zaphod
     restart: always # keep the MySQL server running
     volumes:
-      - my-db:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
 
   trillian-log-server:
     image: gcr.io/projectsigstore/trillian_log_server:v1.3.0
@@ -181,6 +181,3 @@ services:
 
   #### tuf ####
   #### tsa ####
-
-volumes:
-  my-db:

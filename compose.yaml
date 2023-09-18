@@ -15,6 +15,7 @@ services:
       - ./data/fulcio:/var/run/fulcio-secrets/:rw
       - ./data/dex:/var/run/dex/:rw
       - ./data/ctfe:/etc/ctfe/:rw
+      - ./data/rekor:/etc/rekor/:rw
 
   ctfe_init:
     build:
@@ -45,7 +46,7 @@ services:
       - --fileca-cert
       - /var/run/fulcio-secrets/ca.crt
       - --fileca-key-passwd
-      - $(cat /var/run/fulcio-secrets/fulcio-ca-password)
+      - $(cat /var/run/fulcio-secrets/password.txt)
       - --ct-log-url=http://ct_server:6962/trillian
     volumes:
       - ./data/fulcio:/var/run/fulcio-secrets/:ro
@@ -79,6 +80,8 @@ services:
     command:
       - serve
       - --rekor_server.address=0.0.0.0
+      - --rekor_server.signer=/var/run/rekor-secrets/ca.key
+      - --rekor_server.signer-passwd=$(cat /var/run/rekor-secrets/password.txt)
       - --trillian_log_server.address=trillian-log-server
       - --trillian_log_server.port=8090
       - --redis_server.address=redis
@@ -86,6 +89,8 @@ services:
     depends_on:
       - trillian-log-server
       - redis
+    volumes:
+      - ./data/rekor:/var/run/rekor-secrets/:ro
     restart: always
     ports:
       - "3000:3000"

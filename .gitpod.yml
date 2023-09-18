@@ -15,10 +15,6 @@ ports:
     description: Fulcio 
     port: 5555
     visibility: public
-  - name: Fulcio GRPC
-    description: Fulcio GRPC
-    port: 5554
-    visibility: public
   - name: Dex
     description: Dex
     port: 5556

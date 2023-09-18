@@ -1,8 +1,38 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
-    "ghcr.io/devcontainers-contrib/features/bash-command:1": {
-      "command": "URL_PATTERN=\"https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev\" docker compose up -d"
+  "features": {},
+  "forwardPorts": [
+    3000,
+    5555,
+    5556,
+    6962,
+    8080
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "Rekor",
+      "protocol": "http",
+      "visibility": "public"
+    },
+    "5555": {
+      "label": "Fulcio",
+      "protocol": "http",
+      "visibility": "public"
+    },
+    "5556": {
+      "label": "Dex",
+      "protocol": "http",
+      "visibility": "public"
+    },
+    "6962": {
+      "label": "CTLog",
+      "protocol": "http",
+      "visibility": "public"
+    },
+    "8080": {
+      "label": "TUF",
+      "protocol": "http",
+      "visibility": "public"
     }
-  }
+  },
+  "postStartCommand": "URL_PATTERN=\"https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev\" docker compose up -d"
 }

@@ -33,7 +33,9 @@ sed "s@issuer:.*@issuer: $(printf "$URL_PATTERN" "5556")@" /root/dex/config.yaml
 
 ########## CTFE ##############
 
-CTFE_PASSWORD="foobar"
+CTFE_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
+
+echo $CTFE_PASSWORD > /etc/ctfe/password.txt
 
 cp /var/run/fulcio-secrets/ca.crt /etc/ctfe/root.pem
 

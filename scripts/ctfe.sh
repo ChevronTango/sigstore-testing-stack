@@ -25,7 +25,7 @@ function create_log () {
 }
 
 function update_config() {
-	cat /root/ctfe/ct_server.cfg | sed -e "s/%LOGID%/"`cat /tmp/logid`"/g" > /etc/config/ct_server.cfg
+	cat /root/ctfe/ct_server.cfg | sed -e "s/%LOGID%/"`cat /tmp/logid`"/g" | sed -e "s/%PASSWORD%/"`cat /etc/config/password.txt`"/g" > /etc/config/ct_server.cfg
 	# cp /root/ctfe/*.pem /etc/config/
 }
 

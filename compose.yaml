@@ -6,8 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     entrypoint: /init.sh
-    depends_on:
-      - trillian-log-server
     environment:
       - URL_PATTERN=${URL_PATTERN:-http://localhost:%s}
     volumes:
@@ -28,6 +26,7 @@ services:
       - TRILLIAN_LOG_SERVER_RPC=trillian-log-server:8090
     depends_on:
       - trillian-log-server
+      - system_init
     volumes:
       - ./scripts/ctfe.sh:/init.sh:ro
       - ./config/ctfe:/root/ctfe:ro

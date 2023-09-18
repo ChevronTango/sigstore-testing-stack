@@ -76,14 +76,12 @@ cosign initialize --mirror=$(gp url 8080) --root=$(gp url 8080)/root.json
 
 ```
 # GitHub Codespaces
-URL_PATTERN="https://$CODESPACE_NAME-%s.app.github.dev"
-
-git config --global gitsign.fulcio $(printf $URL_PATTERN 5555) # Private Fulcio
-git config --global gitsign.rekor $(printf $URL_PATTERN 3000) # Private Rekor
-git config --global gitsign.issuer $(printf $URL_PATTERN 5556) # Private Issuer
+git config --global gitsign.fulcio https://$CODESPACE_NAME-5555.app.github.dev # Private Fulcio
+git config --global gitsign.rekor https://$CODESPACE_NAME-3000.app.github.dev # Private Rekor
+git config --global gitsign.issuer https://$CODESPACE_NAME-5556.app.github.dev # Private Issuer
 
 # Cosign initialization is only needed when doing verification. Can be skipped if the user is just doing signing.
-cosign initialize --mirror=$(printf $URL_PATTERN 8080) --root=$(printf $URL_PATTERN 8080)/root.json
+cosign initialize --mirror=https://$CODESPACE_NAME-8080.app.github.dev --root=https://$CODESPACE_NAME-8080.app.github.dev/root.json
 ```
 
 4. Make a signed Commit

@@ -46,6 +46,7 @@ services:
       - TUF_TIMESTAMP_PASSPHRASE=timestamp
     depends_on:
       - system_init
+      - rekor
     volumes:
       - ./scripts/tuf.sh:/init.sh:ro
       - ./data/fulcio:/etc/fulcio/:ro

@@ -8,7 +8,7 @@ cp /etc/ctfe/pubkey.pem ./staged/targets/ctfe.pub
 cp /etc/fulcio/ca.crt ./staged/targets/fulcio.crt.pem
 cp /etc/fulcio/ca.crt ./staged/targets/fulcio_v1.crt.pem
 cp /etc/fulcio/ca.crt ./staged/targets/fulcio_intermediate_v1.crt.pem
-cp /etc/rekor/ca.crt ./staged/targets/rekor.pub
+curl $(printf $URL_PATTERN 3000)/api/v1/log/publicKey -o ./staged/targets/rekor.pub
 
 tuf gen-key root
 tuf gen-key targets

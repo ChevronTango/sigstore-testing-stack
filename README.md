@@ -76,7 +76,7 @@ cosign initialize --mirror=$(gp url 8080) --root=$(gp url 8080)/root.json
 
 ```
 # GitHub Codespaces
-URL_PATTERN="https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-%s.app.github.dev"
+URL_PATTERN="https://$CODESPACE_NAME-%s.app.github.dev"
 
 git config --global gitsign.fulcio $(printf $URL_PATTERN 5555) # Private Fulcio
 git config --global gitsign.rekor $(printf $URL_PATTERN 3000) # Private Rekor
@@ -101,7 +101,7 @@ gitsign verify HEAD --certificate-identity kilgore@kilgore.trout --certificate-o
 
 ```
 # GitHub Codespaces
-gitsign verify HEAD --certificate-identity kilgore@kilgore.trout --certificate-oidc-issuer https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-5556.app.github.dev
+gitsign verify HEAD --certificate-identity kilgore@kilgore.trout --certificate-oidc-issuer https://$CODESPACE_NAME-5556.app.github.dev
 ```
 
 If all went well then your commit will be verified and a record of it will be held in your private sigstore instance.

@@ -5,25 +5,25 @@
 FULCIO_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 
 # Write this password out to a file so it can be read by the docker-compose script
-echo $FULCIO_PASSWORD > /var/run/fulcio-secrets/password.txt
+echo $FULCIO_PASSWORD > /ect/fulcio/password.txt
 
 # generate a key and csr to use for fulcio signing
 openssl req \
 -passout pass:$FULCIO_PASSWORD \
 -nodes \
 -newkey rsa:2048 \
--keyout /var/run/fulcio-secrets/ca.key \
--out /var/run/fulcio-secrets/ca.csr \
+-keyout /ect/fulcio/ca.key \
+-out /ect/fulcio/ca.csr \
 -config /root/fulcio/fulcio.conf \
 -extensions v3_ca
 
-chmod 7777 /var/run/fulcio-secrets/ca.key
+chmod 7777 /ect/fulcio/ca.key
 
 # self sign the csr
-openssl x509 -signkey /var/run/fulcio-secrets/ca.key -in /var/run/fulcio-secrets/ca.csr -req -days 365 -out /var/run/fulcio-secrets/ca.crt -extensions v3_ca -extfile /root/fulcio/fulcio.conf
+openssl x509 -signkey /ect/fulcio/ca.key -in /ect/fulcio/ca.csr -req -days 365 -out /ect/fulcio/ca.crt -extensions v3_ca -extfile /root/fulcio/fulcio.conf
 
 # update the fulcio config to use our dex issuer
-sed "s@http://localhost:5556@$(printf "$URL_PATTERN" "5556")@" /root/fulcio/config.json > /var/run/fulcio-secrets/config.json
+sed "s@http://localhost:5556@$(printf "$URL_PATTERN" "5556")@" /root/fulcio/config.json > /ect/fulcio/config.json
 
 
 
@@ -31,7 +31,7 @@ sed "s@http://localhost:5556@$(printf "$URL_PATTERN" "5556")@" /root/fulcio/conf
 ########## DEX ###############
 
 # Update the dex config to use our issuer
-sed "s@issuer:.*@issuer: $(printf "$URL_PATTERN" "5556")@" /root/dex/config.yaml  > /var/run/dex/config.yaml
+sed "s@issuer:.*@issuer: $(printf "$URL_PATTERN" "5556")@" /root/dex/config.yaml  > /ect/dex/config.yaml
 
 
 
@@ -68,7 +68,7 @@ CTFE_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 echo $CTFE_PASSWORD > /etc/ctfe/password.txt
 
 # Copy the fulcio root secret to the output
-cp /var/run/fulcio-secrets/ca.crt /etc/ctfe/root.pem
+cp /ect/fulcio/ca.crt /etc/ctfe/root.pem
 
 # generate an EC key for use by the CT Log
 openssl ecparam -name prime256v1 -genkey -noout | \

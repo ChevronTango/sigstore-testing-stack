@@ -12,8 +12,8 @@ services:
       - ./scripts/system.sh:/init.sh:ro
       - ./config/fulcio:/root/fulcio:ro
       - ./config/dex:/root/dex:ro
-      - ./data/fulcio:/var/run/fulcio-secrets/:rw
-      - ./data/dex:/var/run/dex/:rw
+      - ./data/fulcio:/ect/fulcio/:rw
+      - ./data/dex:/ect/dex/:rw
       - ./data/ctfe:/etc/ctfe/:rw
       - ./data/rekor:/etc/rekor/:rw
 

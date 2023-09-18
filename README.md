@@ -21,9 +21,25 @@ This project was built with Gitpod in mind, and the quickest way for users to ge
 
 When you open the workspace, Gitpod will run `docker compose up` which will initialize and run the scaffolding with all of the components needed.
 
+`URL_PATTERN` is automatically set in the startup script however you may need to set it again in any future scripts you run.
+
+## GitHub Codespaces
+
+GitHub codespaces are also supported, however for it to work effectively, you will need to make sure that the ports are all public.
+
+![Codespaces Ports](docs/codespaces-ports.JPG)
+
+If you find that codespaces ports are not already public, you can change them yourself and then restart docker compose
+
+```
+docker compose restart
+```
+
+`URL_PATTERN` is automatically set in the startup script however you may need to set it again in any future scripts you run.
+
 ## Running Locally
 
-I haven't done much testing locally, but I've tried to keep the majority of the hard work in docker containers where possible. In theory all you need to do is run the `docker compose up` script and the stack should stand up just the same as it would in Gitpod. The only difference is that the URLs and Dex Issuer will be at `localhost` instead of your Gitpod URL.
+I haven't done much testing locally, but I've tried to keep the majority of the hard work in docker containers where possible. In theory all you need to do is run the `docker compose up` script and the stack should stand up just the same as it would in Gitpod. The only difference is that the URLs and Dex Issuer will be at `localhost` instead of your Gitpod URL. If you need to set the URL as something else then you can use the `URL_PATTERN`.
 
 ## Client Setup
 
@@ -79,7 +95,13 @@ git commit -m "Test" --allow-empty
 5. Verify Your commit
 
 ```
+# Gitpod
 gitsign verify HEAD --certificate-identity kilgore@kilgore.trout --certificate-oidc-issuer $(gp url 5556)
+```
+
+```
+# GitHub Codespaces
+gitsign verify HEAD --certificate-identity kilgore@kilgore.trout --certificate-oidc-issuer https://$(jq -r '.CODESPACE_NAME' /workspaces/.codespaces/shared/environment-variables.json)-5556.app.github.dev
 ```
 
 If all went well then your commit will be verified and a record of it will be held in your private sigstore instance.

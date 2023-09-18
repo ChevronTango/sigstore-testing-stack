@@ -1,4 +1,38 @@
 services:
+  #### init ####
+  
+  system_init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: /init.sh
+    depends_on:
+      - trillian-log-server
+    environment:
+      - URL_PATTERN=${URL_PATTERN:-http://localhost:%s}
+    volumes:
+      - ./scripts/system.sh:/init.sh:ro
+      - ./config/fulcio:/root/fulcio:ro
+      - ./config/dex:/root/dex:ro
+      - ./data/fulcio:/var/run/fulcio-secrets/:rw
+      - ./data/dex:/var/run/dex/:rw
+      - ./data/ctfe:/etc/ctfe/:rw
+
+  ctfe_init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: /init.sh
+    environment:
+      - TRILLIAN_LOG_SERVER_HTTP=trillian-log-server:8091
+      - TRILLIAN_LOG_SERVER_RPC=trillian-log-server:8090
+    depends_on:
+      - trillian-log-server
+    volumes:
+      - ./scripts/ctfe.sh:/init.sh:ro
+      - ./config/ctfe:/root/ctfe:ro
+      - ./data/ctfe:/etc/config/:rw
+
   #### fulcio ####
   fulcio:
     image: gcr.io/projectsigstore/fulcio:v1.4.0
@@ -8,17 +42,15 @@ services:
       - --grpc-port=5554
       - --ca=fileca
       - --fileca-key
-      - /var/run/fulcio-secrets/int.key
+      - /var/run/fulcio-secrets/ca.key
       - --fileca-cert
-      - /var/run/fulcio-secrets/int.crt
+      - /var/run/fulcio-secrets/ca.crt
       - --fileca-key-passwd
-      - $(cat /var/run/fulcio-ca-password)
+      - $(cat /var/run/fulcio-secrets/fulcio-ca-password)
       - --ct-log-url=http://ct_server:6962/trillian
-    secrets:
-      - fulcio-ca-password
     volumes:
-      - ./fulcio-secrets:/var/run/fulcio-secrets/
-      - ./fulcio-config:/etc/fulcio-config/
+      - ./data/fulcio:/var/run/fulcio-secrets/:ro
+      - ./data/fulcio/config.json:/etc/fulcio-config/config.json:ro
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5555/healthz"]
@@ -33,6 +65,7 @@ services:
     depends_on:
       - dex
       - ct_server
+      - system_init
 
   #### rekor ####
   redis:
@@ -102,19 +135,10 @@ services:
       - mysql
 
   #### ctlog ####
-  ctfe_init:
-    build:
-      context: .
-      dockerfile: Dockerfile.ctfe_init
-    depends_on:
-      - trillian-log-server
-    volumes:
-      - ./ctfeConfig:/etc/config/:rw
-
   ct_server:
     image: gcr.io/trillian-opensource-ci/ctfe
     volumes:
-      - ./ctfeConfig:/etc/config/:ro
+      - ./data/ctfe:/etc/config/:ro
     command: [
         "--log_config" ,"/etc/config/ct_server.cfg",
         "--log_rpc_server", "trillian-log-server:8090",
@@ -134,25 +158,23 @@ services:
   dex:
     image: ghcr.io/dexidp/dex:v2.37.0
     restart: always
-    command:
+    command: 
       - dex
       - serve
       - --web-http-addr
       - 0.0.0.0:5556
       - --telemetry-addr
       - 0.0.0.0:5558
-      - /etc/dex/config.yaml
+      - /var/run/dex/config.yaml
     ports:
       - "5556:5556"
     volumes:
-      - ./dex:/etc/dex/
+      - ./data/dex:/var/run/dex/:ro
+    depends_on:
+      - system_init
 
   #### tuf ####
   #### tsa ####
-
-secrets:
-  fulcio-ca-password:
-    file: fulcio-secrets/password.txt
 
 # volumes:
 #   ctfeConfig: {}

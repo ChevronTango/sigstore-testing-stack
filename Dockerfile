@@ -18,8 +18,3 @@ FROM golang:1.21.1@sha256:cffaba795c36f07e372c7191b35ceaae114d74c31c3763d442982e
 WORKDIR /root/
 
 RUN go install github.com/google/trillian/cmd/createtree@v1.3.10
-ADD ./config/logid.sh /root/
-ADD ./config/ctfe /root/ctfe
-RUN chmod +x /root/logid.sh
-
-CMD /root/logid.sh

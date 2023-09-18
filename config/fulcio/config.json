@@ -1,0 +1,11 @@
+{
+    "OIDCIssuers": {
+      "http://localhost:5556": {
+        "IssuerURL": "http://localhost:5556",
+        "ClientID": "sigstore",
+        "Type": "email"
+      }
+    },
+    "MetaIssuers": {
+    }
+}

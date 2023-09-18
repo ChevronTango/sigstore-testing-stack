@@ -1,5 +1,5 @@
 # Set it to a valid URL
-issuer: https://5556-chevrontang-sigstoretes-6n3nt8yrvpr.ws-eu104.gitpod.io
+issuer: http://localhost:5556
 
 # See https://dexidp.io/docs/storage/ for more options
 storage:

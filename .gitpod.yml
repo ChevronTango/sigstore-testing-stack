@@ -2,7 +2,7 @@
 tasks:
   - name: Script Task
     init: docker compose build
-    command: ./start.sh
+    command: ./start.sh -d
   - command: brew tap sigstore/tap && brew install gitsign && brew install cosign
 
 # List the ports to expose. Learn more: https://www.gitpod.io/docs/configure/workspaces/ports
@@ -26,6 +26,10 @@ ports:
   - name: CTLog
     description: CTLog
     port: 6962
+    visibility: public
+  - name: TUF
+    description: TUF
+    port: 8080
     visibility: public
 
 # Learn more from ready-to-use templates: https://www.gitpod.io/docs/introduction/getting-started/quickstart

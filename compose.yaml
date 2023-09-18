@@ -12,8 +12,8 @@ services:
       - ./scripts/system.sh:/init.sh:ro
       - ./config/fulcio:/root/fulcio:ro
       - ./config/dex:/root/dex:ro
-      - ./data/fulcio:/ect/fulcio/:rw
-      - ./data/dex:/ect/dex/:rw
+      - ./data/fulcio:/etc/fulcio/:rw
+      - ./data/dex:/etc/dex/:rw
       - ./data/ctfe:/etc/ctfe/:rw
       - ./data/rekor:/etc/rekor/:rw
 
@@ -32,6 +32,27 @@ services:
       - ./scripts/ctfe.sh:/init.sh:ro
       - ./config/ctfe:/root/ctfe:ro
       - ./data/ctfe:/etc/config/:rw
+    
+  tuf_init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: /init.sh
+    environment:
+      - URL_PATTERN=${URL_PATTERN:-http://localhost:%s}
+      - TUF_ROOT_PASSPHRASE=root
+      - TUF_TARGETS_PASSPHRASE=targets
+      - TUF_SNAPSHOT_PASSPHRASE=snapshot
+      - TUF_TIMESTAMP_PASSPHRASE=timestamp
+    depends_on:
+      - system_init
+    volumes:
+      - ./scripts/tuf.sh:/init.sh:ro
+      - ./data/fulcio:/etc/fulcio/:ro
+      - ./data/dex:/etc/dex/:ro
+      - ./data/ctfe:/etc/ctfe/:ro
+      - ./data/rekor:/etc/rekor/:ro
+      - ./data/tuf:/etc/tuf/:rw
 
   #### fulcio ####
   fulcio:
@@ -180,4 +201,14 @@ services:
       - system_init
 
   #### tuf ####
+
+  tuf:
+    image: httpd:latest
+    container_name: my-apache-app
+    ports:
+    - '8080:80'
+    volumes:
+    - ./data/tuf/repository:/usr/local/apache2/htdocs
+    depends_on:
+      - tuf_init
   #### tsa ####

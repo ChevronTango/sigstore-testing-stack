@@ -18,3 +18,5 @@ FROM golang:1.21.1@sha256:cffaba795c36f07e372c7191b35ceaae114d74c31c3763d442982e
 WORKDIR /root/
 
 RUN go install github.com/google/trillian/cmd/createtree@v1.3.10
+RUN go install github.com/theupdateframework/go-tuf/cmd/tuf@v0.6.1
+RUN apt-get update && apt-get install jq -y

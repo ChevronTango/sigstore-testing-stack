@@ -1,6 +1,8 @@
 #!/bin/bash
 
+##############################
 ########## FULCIO ############
+##############################
 if [ ! -f /etc/fulcio/password.txt ]; then
 # Generate A password to encrypt the certificate key with
 FULCIO_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
@@ -30,7 +32,9 @@ fi
 
 
 
+##############################
 ########## DEX ###############
+##############################
 if [ ! -f /etc/dex/config.yaml ]; then
 
 # Update the dex config to use our issuer
@@ -40,7 +44,9 @@ fi
 
 
 
+##############################
 ########## REKOR #############
+##############################
 if [ ! -f /etc/rekor/password.txt ]; then
 # Generate A password to encrypt the certificate with
 REKOR_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
@@ -48,60 +54,18 @@ REKOR_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 # Write this password out to a file so it can be read by the docker-compose script
 echo $REKOR_PASSWORD > /etc/rekor/password.txt
 
-# generate a key and csr to use for fulcio signing
-
-# echo "key"
-# openssl ecparam -name prime256v1 -genkey -out /etc/rekor/ec_key.pem
-
-# chmod 7777 /etc/rekor/ec_key.pem
-
-# echo "csr"
-# openssl req -new -sha256 -key /etc/rekor/ec_key.pem -nodes -out /etc/rekor/ec.csr
-# openssl req \
-# -new \
-# -sha256 \
-# -passout pass:$FULCIO_PASSWORD \
-# -nodes \
-# -key /etc/rekor/ec_key.pem \
-# -out /etc/rekor/ec.csr \
-# -config /root/fulcio/fulcio.conf \
-# -extensions v3_ca
-
-# chmod 7777 /etc/rekor/ec.csr
-
-# echo "cert"
-# openssl x509 -signkey /etc/rekor/ec_key.pem -in /etc/rekor/ec.csr -req -days 365 -out /etc/rekor/cert.pem -extensions v3_ca -extfile /root/fulcio/fulcio.conf
-
-# chmod 7777 /etc/rekor/cert.pem
-
-# generate a key and csr to use for fulcio signing
-# openssl req \
-# -passout pass:$REKOR_PASSWORD \
-# -nodes \
-# -newkey ec \
-# -keyout /etc/rekor/ca.key \
-# -out /etc/rekor/ca.csr \
-# -config /root/fulcio/fulcio.conf \
-# -extensions v3_ca
-# openssl ecparam -genkey -name prime256v1 -noout -out ec256-key-pair.pem
-
-# openssl genpkey -genparam -algorithm ec -pkeyopt ec_paramgen_curve:P-384 -out ECPARAM.pem
-
+# Generating EC cert for Rekor
 openssl ecparam -genkey -name prime256v1 > /etc/rekor/key.pem
 openssl pkcs8 -topk8 -in /etc/rekor/key.pem -nocrypt > /etc/rekor/cert.pem
 
-# openssl ecparam -genkey -name secp384r1 -noout | openssl req -new -x509 -sha384 -nodes -days 365 -passout pass:$REKOR_PASSWORD -out /etc/rekor/ca.key -config /root/fulcio/fulcio.conf -extensions v3_ca
-
 chmod 7777 /etc/rekor/cert.pem
-
-# self sign the csr
-# openssl x509 -signkey /etc/rekor/ca.key -in /etc/rekor/ca.csr -req -days 365 -out /etc/rekor/ca.crt -extensions v3_ca -extfile /root/fulcio/fulcio.conf
-
 
 fi
 
 
+##############################
 ########## CTFE ##############
+##############################
 if [ ! -f /etc/ctfe/password.txt ]; then
 # Generate A password to encrypt the keys with
 CTFE_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')

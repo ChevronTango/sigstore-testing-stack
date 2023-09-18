@@ -3,6 +3,13 @@
     "ghcr.io/devcontainers-contrib/features/gitsign:1": {},
     "ghcr.io/devcontainers-contrib/features/cosign:1": {}
   },
+  "forwardPorts": [
+    3000,
+    5555,
+    5556,
+    6962,
+    8080
+  ],
   "portsAttributes": {
     "3000": {
       "label": "Rekor",
@@ -27,6 +34,5 @@
   },
   "otherPortsAttributes": {
     "onAutoForward": "ignore"
-  },
-  "postStartCommand": "gh codespace ports visibility 3000:public 5555:public 5556:public 6962:public 8080:public -c $CODESPACE_NAME && export URL_PATTERN=\"https://$CODESPACE_NAME-%s.app.github.dev\" && docker compose up -d"
+  }
 }

@@ -25,14 +25,14 @@ When you open the workspace, Gitpod will run `docker compose up` which will init
 
 ## GitHub Codespaces
 
-GitHub codespaces are also supported, however for it to work effectively, you will need to make sure that the ports are all public.
+GitHub codespaces are also supported, however it will not start the stack automatically as for it to work you will need to make sure that the named ports are all public first, which cannot be configured in the `devcontainer.json` at the time of writing.
 
 ![Codespaces Ports](docs/codespaces-ports.JPG)
 
-If you find that codespaces ports are not already public, you can change them yourself and then restart docker compose
+Once you have made all the ports public, you can run the following command to start the stack.
 
 ```
-docker compose restart
+URL_PATTERN="https://$CODESPACE_NAME-%s.app.github.dev" docker compose up -d
 ```
 
 `URL_PATTERN` is automatically set in the startup script however you may need to set it again in any future scripts you run.
@@ -40,6 +40,10 @@ docker compose restart
 ## Running Locally
 
 I haven't done much testing locally, but I've tried to keep the majority of the hard work in docker containers where possible. In theory all you need to do is run the `docker compose up` script and the stack should stand up just the same as it would in Gitpod. The only difference is that the URLs and Dex Issuer will be at `localhost` instead of your Gitpod URL. If you need to set the URL as something else then you can use the `URL_PATTERN`.
+
+## Restarting
+
+If you have to restart for whatever reason, you can call `docker compose down` and run the `./remove-data.sh` script to clear out all the files which might cause issue. You can then call `URL_PATTERN="https://$CODESPACE_NAME-%s.app.github.dev" docker compose up -d` again (or whichever URL_PATTERN is relevant to your workspace).
 
 ## Client Setup
 

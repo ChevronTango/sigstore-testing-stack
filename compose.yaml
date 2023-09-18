@@ -112,7 +112,7 @@ services:
       - redis
       - system_init
     volumes:
-      - ./data/attestations:/var/run/attestations:z"
+      - ./data/attestations:/var/run/attestations:rw"
       - ./data/rekor:/var/run/rekor-secrets/:ro
     restart: always
     ports:

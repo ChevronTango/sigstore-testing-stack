@@ -85,3 +85,5 @@ A few of the components need to have certain config or certs generated first and
 ## Dex
 
 Dex acts as a Identity Provider to the Sigstore stack, and it's what users are redirected to when they need to sign a commit. To avoid complex integrations with GitHub IDPs or others I have chosen to only use the built in Mock provider to demonstrate Dex's capabilities whilst avoiding and integration work. Users can read through the Dex documentation if they require more complex federation in their own environment
+
+NOTE: because of the mock IDP in DEX, all your commits will be signed by `kilgore@kilgore.trout`, which you will need to provide when doing any verification.

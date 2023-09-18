@@ -33,9 +33,13 @@ sed "s@issuer:.*@issuer: $(printf "$URL_PATTERN" "5556")@" /root/dex/config.yaml
 
 ########## CTFE ##############
 
+CTFE_PASSWORD="foobar"
+
 cp /var/run/fulcio-secrets/ca.crt /etc/ctfe/root.pem
 
-# openssl ecparam -name prime256v1 -genkey -noout -out ctfe-config/private.key
-# openssl ec -in ctfe-config/private.key -pubout -out ctfe-config/public
+openssl ecparam -name prime256v1 -genkey -noout | \
+openssl ec -out /etc/ctfe/privkey.pem -aes256 -passout pass:$CTFE_PASSWORD
+
+openssl ec -passin pass:$CTFE_PASSWORD -in /etc/ctfe/privkey.pem -pubout -out /etc/ctfe/pubkey.pem
 
 # openssl pkcs8 -topk8 -nocrypt -in ctfe-config/private.key -out ctfe-config/private

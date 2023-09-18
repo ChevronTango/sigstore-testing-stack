@@ -1,5 +1,8 @@
 {
-  "features": {},
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/gitsign:1": {},
+    "ghcr.io/devcontainers-contrib/features/cosign:1": {}
+  },
   "forwardPorts": [
     3000,
     5555,

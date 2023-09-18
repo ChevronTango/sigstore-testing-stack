@@ -32,16 +32,18 @@ sed "s@issuer:.*@issuer: $(printf "$URL_PATTERN" "5556")@" /root/dex/config.yaml
 
 
 ########## CTFE ##############
-
+# Generate A password to encrypt the keys with
 CTFE_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
 
+# Write this password out to a file so it can be read by the docker-compose script
 echo $CTFE_PASSWORD > /etc/ctfe/password.txt
 
+# Copy the fulcio root secret to the output
 cp /var/run/fulcio-secrets/ca.crt /etc/ctfe/root.pem
 
+# generate an EC key for use by the CT Log
 openssl ecparam -name prime256v1 -genkey -noout | \
 openssl ec -out /etc/ctfe/privkey.pem -aes256 -passout pass:$CTFE_PASSWORD
 
+# Generate the public key from the private
 openssl ec -passin pass:$CTFE_PASSWORD -in /etc/ctfe/privkey.pem -pubout -out /etc/ctfe/pubkey.pem
-
-# openssl pkcs8 -topk8 -nocrypt -in ctfe-config/private.key -out ctfe-config/private

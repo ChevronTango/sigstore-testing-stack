@@ -24,13 +24,9 @@ function create_log () {
 	echo -n "Created log ID " && cat /etc/config/logid
 }
 
-function update_config() {
-	cat /root/ctfe/ct_server.cfg | sed -e "s/%LOGID%/"`cat /etc/config/logid`"/g" | sed -e "s/%PASSWORD%/"`cat /etc/config/password.txt`"/g" > /etc/config/ct_server.cfg
-}
-
 # check to see if log id exists; if so, use that
 echo -n "Checking for existing configuration..."
-if ! [[ -s /etc/config/ct_server.cfg ]]; then
+if ! [[ -s /etc/config/logid ]]; then
 	echo " none found."
 	echo "Checking for preexisting logs..."
 	get_log_id
@@ -38,14 +34,6 @@ if ! [[ -s /etc/config/ct_server.cfg ]]; then
 	if ! [[ -s /etc/config/logid ]]; then
 		echo "No log found; let's create one..."
 		create_log
-		# update config file accordingly
-		update_config
-	else
-		echo "Log ID known but config not found"
-		update_config
 	fi
-else
-	echo " found."
-	configid=`cat /etc/config/ct_server.cfg|grep log_id|awk ' { print $2 } '`
-	echo "Existing configuration uses log ID $configid"
 fi
+echo "LOGID=$(cat /etc/config/logid)" > /etc/config/variables.env

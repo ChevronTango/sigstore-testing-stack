@@ -32,6 +32,21 @@ services:
       - ./scripts/ctfe.sh:/init.sh:ro
       - ./config/ctfe:/root/ctfe:ro
       - ./data/ctfe:/etc/config/:rw
+
+  rekor_init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: /init.sh
+    environment:
+      - TRILLIAN_LOG_SERVER_HTTP=trillian-log-server:8091
+      - TRILLIAN_LOG_SERVER_RPC=trillian-log-server:8090
+    depends_on:
+      - trillian-log-server
+      - system_init
+    volumes:
+      - ./scripts/rekor.sh:/init.sh:ro
+      - ./data/rekor:/etc/config/:rw
     
   tuf_init:
     build:
@@ -93,26 +108,34 @@ services:
     expose:
       - '6379:6379'
     command: redis-server
+    volumes:
+        - redis:/data
 
   rekor:
     image: gcr.io/projectsigstore/rekor-server:v1.3.0
+    entrypoint: sh
     command:
-      - serve
-      - --rekor_server.address=0.0.0.0
-      - --rekor_server.signer=/var/run/rekor-secrets/cert.pem
-      - --rekor_server.signer-passwd=$(cat /var/run/rekor-secrets/password.txt)
-      - --trillian_log_server.address=trillian-log-server
-      - --trillian_log_server.port=8090
-      - --redis_server.address=redis
-      - --redis_server.port=6379
-      - --enable_attestation_storage=true
-      - --attestation_storage_bucket=file:///var/run/attestations
+      - -c 
+      - | 
+        rekor-server \
+        serve \
+        --rekor_server.address=0.0.0.0 \
+        --rekor_server.signer=/var/run/rekor-secrets/cert.pem \
+        --rekor_server.signer-passwd=$(cat /var/run/rekor-secrets/password.txt) \
+        --trillian_log_server.tlog_id=$(cat /var/run/rekor-secrets/logid)  \
+        --trillian_log_server.address=trillian-log-server \
+        --trillian_log_server.port=8090 \
+        --redis_server.address=redis \
+        --redis_server.port=6379 \
+        --enable_attestation_storage=true \
+        --attestation_storage_bucket=file:///var/run/attestations
     depends_on:
       - trillian-log-server
       - redis
       - system_init
+      - rekor_init
     volumes:
-      - ./data/attestations:/var/run/attestations:rw"
+      - attestations:/var/run/attestations:rw"
       - ./data/rekor:/var/run/rekor-secrets/:ro
     restart: always
     ports:
@@ -128,7 +151,7 @@ services:
       - MYSQL_PASSWORD=zaphod
     restart: always # keep the MySQL server running
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - mysql:/var/lib/mysql
 
   trillian-log-server:
     image: gcr.io/projectsigstore/trillian_log_server:v1.3.0
@@ -213,3 +236,8 @@ services:
     depends_on:
       - tuf_init
   #### tsa ####
+
+volumes:
+  mysql:
+  attestations:
+  redis:
